@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register - StylePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--glass-border);
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: -2px;
+        }
+        .auth-form {
+            display: none;
+        }
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .error-message {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 10px;
+            border-radius: var(--radius);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html">The Collection</a>
+                    <a href="custom-request.html">Design Your Own</a>
+                    <a href="cart.html">Bag (<span id="cart-count">0</span>)</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="flex: 1; display: flex; align-items: center; justify-content: center;">
+        <div class="glass-panel auth-container animate-fade">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('login')">Login</div>
+                <div class="tab" onclick="switchTab('register')">Register</div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div id="loginError" class="error-message"></div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPwd" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form">
+                <div id="regError" class="error-message"></div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPwd" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-accent" style="width: 100%;">Create Account</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help finding the perfect fit?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - StylePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px 0;
+        }
+        @media (max-width: 800px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .product-img {
+            width: 100%;
+            border-radius: var(--radius);
+            height: 600px;
+            object-fit: cover;
+            box-shadow: var(--glass-shadow);
+        }
+        .size-btn {
+            padding: 10px 15px;
+            border: 2px solid var(--glass-border);
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .size-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+        .custom-section {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.7);
+            border-radius: var(--radius);
+            border: 1px dashed var(--primary-color);
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .price {
+            font-size: 2rem;
+            color: var(--accent-color);
+            font-weight: 800;
+            margin: 20px 0;
+        }
+        #imgPreview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html" style="color: var(--accent-color);">The Collection</a>
+                    <a href="custom-request.html">Design Your Own</a>
+                    <a href="cart.html">Bag (<span id="cart-count">0</span>)</a>
+                    <a href="auth.html" id="auth-link">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="product-grid animate-fade" id="productContainer">
+            <!-- Rendered via JS -->
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help finding the perfect fit?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            const product = CATALOG.find(p => p.id === id);
+
+            if (!product) {
+                window.location.href = 'shop.html';
+                return;
+            }
+
+            document.title = product.name + " - StylePro";
+
+            const container = document.getElementById('productContainer');
+            container.innerHTML = `
+                <div>
+                    <img src="${product.image}" alt="${product.name}" class="product-img">
+                </div>
+                <div class="glass-panel" style="padding: 40px; height: fit-content;">
+                    <h1 style="font-size: 2.5rem; margin-bottom: 10px; color: var(--primary-color);">${product.name}</h1>
+                    <p style="color: var(--text-muted); line-height: 1.6;">${product.desc}</p>
+                    <div class="price">${formatINR(product.price)}</div>
+                    
+                    <h3 style="margin-bottom: 10px;">Select Size:</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="sizeSelection">
+                        <button type="button" class="size-btn active" data-size="S">S</button>
+                        <button type="button" class="size-btn" data-size="M">M</button>
+                        <button type="button" class="size-btn" data-size="L">L</button>
+                        <button type="button" class="size-btn" data-size="XL">XL</button>
+                        <button type="button" class="size-btn" data-size="Custom" style="background: var(--accent-color); color: white; border: none;">Custom Fit</button>
+                    </div>
+                    
+                    <!-- Box for Odd Sizes -->
+                    <div class="custom-section" id="customInputs">
+                        <h4 style="margin-bottom: 15px; color: var(--primary-color);">Enter unique measurements (inches):</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <label style="font-size: 14px; display: block; margin-bottom: 5px;">Chest</label>
+                                <input type="number" id="mChest" class="form-control" placeholder="42.5">
+                            </div>
+                            <div>
+                                <label style="font-size: 14px; display: block; margin-bottom: 5px;">Waist</label>
+                                <input type="number" id="mWaist" class="form-control" placeholder="34.2">
+                            </div>
+                            <div>
+                                <label style="font-size: 14px; display: block; margin-bottom: 5px;">Arm/Leg Length</label>
+                                <input type="number" id="mLength" class="form-control" placeholder="25">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="border:none; border-top: 1px solid var(--glass-border); margin: 30px 0;">
+                    
+                    <h3 style="margin-bottom: 15px;">Add Personal Customizations:</h3>
+                    <div class="form-group">
+                        <label>Custom Text / Monogram (Optional)</label>
+                        <input type="text" id="customText" class="form-control" placeholder="e.g., 'V.T.' on the collar">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Custom Design / Logo (Optional)</label>
+                        <input type="file" id="customImageUpload" class="form-control" accept="image/*">
+                        <img id="imgPreview" src="" alt="Preview">
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-primary" id="addToCartBtn" style="flex: 1; padding: 15px; font-size: 18px;">Add to Cart</button>
+                        <button class="btn" id="prodWishlistBtn" style="border: 2px solid var(--primary-color); background: transparent; padding: 15px; font-size: 18px; color: var(--primary-color); width: 60px;">♥</button>
+                    </div>
+                </div>
+            `;
+            
+            // Reviews Section
+            const reviewsHTML = `
+                <div class="glass-panel" style="grid-column: 1 / -1; padding: 40px; margin-top: 20px;">
+                    <h2 style="color: var(--primary-color); margin-bottom: 20px;">Customer Reviews</h2>
+                    
+                    <!-- Write Review -->
+                    <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--glass-border);">
+                        <h4 style="margin-bottom: 10px;">Write a Review</h4>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" id="revName" class="form-control" placeholder="Your Name" style="max-width: 200px;">
+                            <select id="revStars" class="form-control" style="max-width: 100px;">
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                        </div>
+                        <textarea id="revText" class="form-control" rows="3" placeholder="Tell us what you think about this piece..." style="margin-bottom: 10px;"></textarea>
+                        <button class="btn btn-primary" id="submitReviewBtn">Submit Feedback</button>
+                    </div>
+
+                    <!-- Reviews List -->
+                    <div id="reviewsList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', reviewsHTML);
+            
+            // Initialize Prod Wishlist Button
+            const pwBtn = document.getElementById('prodWishlistBtn');
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const doc = await db.collection('wishlists').doc(user.uid).get();
+                    const wishlists = doc.exists ? (doc.data().items || []) : [];
+                    if (wishlists.includes(product.id)) {
+                        pwBtn.classList.add('active');
+                        pwBtn.style.color = '#fff';
+                        pwBtn.style.background = 'var(--primary-color)';
+                    }
+                }
+            });
+            pwBtn.addEventListener('click', () => {
+                toggleWishlist(product.id, pwBtn); // Let main.js handle the visual toggle
+            });
+
+            // State
+            let selectedSize = 'S';
+            let customImageDataUrl = null;
+
+            // Size Logic
+            const sizeBtns = document.querySelectorAll('.size-btn');
+            const customArea = document.getElementById('customInputs');
+            sizeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    sizeBtns.forEach(b => {
+                        b.classList.remove('active');
+                        if (b.dataset.size === 'Custom') {
+                            b.style.background = 'var(--accent-color)';
+                            b.style.color = 'white';
+                        }
+                    });
+                    
+                    btn.classList.add('active');
+                    selectedSize = btn.dataset.size;
+                    
+                    if (selectedSize === 'Custom') {
+                        btn.style.background = 'var(--primary-color)';
+                        customArea.style.display = 'block';
+                    } else {
+                        customArea.style.display = 'none';
+                    }
+                });
+            });
+
+            // Image Upload Preview Logic
+            const uploadInput = document.getElementById('customImageUpload');
+            const preview = document.getElementById('imgPreview');
+            uploadInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        customImageDataUrl = e.target.result;
+                        preview.src = customImageDataUrl;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    customImageDataUrl = null;
+                    preview.style.display = 'none';
+                }
+            });
+
+            // Add to Cart
+            document.getElementById('addToCartBtn').addEventListener('click', () => {
+                const cartItem = {
+                    id: Date.now().toString(),
+                    productId: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    size: selectedSize,
+                    customText: document.getElementById('customText').value.trim(),
+                    customImage: customImageDataUrl
+                };
+
+                if (selectedSize === 'Custom') {
+                    const chest = document.getElementById('mChest').value;
+                    const waist = document.getElementById('mWaist').value;
+                    const length = document.getElementById('mLength').value;
+                    
+                    if(!chest || !waist || !length) {
+                        alert('Please enter all odd/custom measurements.');
+                        return;
+                    }
+                    cartItem.sizeDetails = `Chest: ${chest}", Waist: ${waist}", Length: ${length}"`;
+                }
+
+                addToCart(cartItem);
+                
+                const btn = document.getElementById('addToCartBtn');
+                btn.textContent = 'Added to Cart!';
+                btn.style.background = '#27ae60';
+                setTimeout(() => {
+                    btn.textContent = 'Add to Cart';
+                    btn.style.background = 'var(--primary-color)';
+                }, 2000);
+            });
+
+            // Review Logic
+            async function renderReviews() {
+                const rList = document.getElementById('reviewsList');
+                try {
+                    const snap = await db.collection('reviews').where('productId', '==', product.id).get();
+                    if (snap.empty) {
+                        rList.innerHTML = '<p style="color: var(--text-muted);">No reviews yet. Be the first to share your thoughts!</p>';
+                        return;
+                    }
+                    rList.innerHTML = '';
+                    let reviews = [];
+                    snap.forEach(doc => reviews.push(doc.data()));
+                    reviews.sort((a,b) => {
+                        let d1 = a.date ? a.date.toDate() : new Date(0);
+                        let d2 = b.date ? b.date.toDate() : new Date(0);
+                        return d2 - d1;
+                    });
+                    
+                    reviews.forEach(r => {
+                        let starsHTML = '';
+                        for(let i=0; i<5; i++) { starsHTML += (i < r.stars) ? '★' : '☆'; }
+                        rList.innerHTML += `
+                            <div style="margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <strong>${r.name}</strong>
+                                    <span style="color: #f1c40f;">${starsHTML}</span>
+                                </div>
+                                <p style="font-size: 14px; line-height: 1.5;">${r.text}</p>
+                                <span style="font-size: 11px; color: #999;">${r.date ? r.date.toDate().toLocaleDateString() : ''}</span>
+                            </div>
+                        `;
+                    });
+                } catch(error) {
+                    console.error("Error loading reviews", error);
+                }
+            }
+            renderReviews();
+
+            document.getElementById('submitReviewBtn').addEventListener('click', async () => {
+                const name = document.getElementById('revName').value.trim();
+                const text = document.getElementById('revText').value.trim();
+                const stars = document.getElementById('revStars').value;
+                if (!name || !text) { alert('Please enter both name and review text.'); return; }
+
+                const btn = document.getElementById('submitReviewBtn');
+                btn.disabled = true;
+
+                try {
+                    await db.collection('reviews').add({
+                        productId: product.id,
+                        name: name,
+                        text: text,
+                        stars: parseInt(stars),
+                        date: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    document.getElementById('revName').value = '';
+                    document.getElementById('revText').value = '';
+                    renderReviews();
+                } catch(e) {
+                    console.error("Error posting review", e);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

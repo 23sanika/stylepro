@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - StylePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="glass-panel">
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="product.html">Shop More</a>
+                    <a href="profile.html">My Profile</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+        <div class="glass-panel animate-fade" style="padding: 60px 40px; text-align: center; max-width: 600px; width: 100%;">
+            <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
+            <h1 style="color: var(--primary-color); margin-bottom: 20px; font-size: 2.5rem;">Order Confirmed!</h1>
+            <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 40px; line-height: 1.6;">
+                Thank you for your purchase. Our master tailors will begin crafting your custom pieces immediately. You will receive shipping updates via email.
+            </p>
+            
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <a href="profile.html" class="btn btn-primary">View My Orders</a>
+                <a href="index.html" class="btn glass-panel" style="color: var(--primary-color);">Back to Home</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help finding the perfect fit?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StylePro Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #f4f6f8; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; background: var(--primary-color); color: white; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 24px; letter-spacing: 2px; }
+        .nav-item { padding: 15px 20px; color: #ccc; cursor: pointer; transition: 0.3s; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: white; border-left-color: var(--accent-color); }
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #ebebeb; }
+        .stat-value { font-size: 28px; font-weight: 800; color: var(--primary-color); margin-top: 5px; }
+        .stat-label { color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; border: 1px solid #ebebeb; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        th { background: #fdfdfc; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-size: 12px; }
+        tr:hover { background: #fafafa; }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-processing { background: #cce5ff; color: #004085; }
+        
+        .view-section { display: none; }
+        .view-section.active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease forwards; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-logo logo">StylePro</div>
+        <div style="margin-top: 20px;">
+            <div class="nav-item active" onclick="switchView('orders', this)">Orders</div>
+            <div class="nav-item" onclick="switchView('requests', this)">Custom Requests</div>
+            <div class="nav-item" onclick="switchView('feedback', this)">Customer Feedback</div>
+            <div class="nav-item" style="margin-top: 50px; color: #ff6b6b;" onclick="adminLogout()">Logout</div>
+            <div class="nav-item" style="margin-top: 10px;" onclick="window.location.href='index.html'">Back to Store</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <h1 id="pageTitle" style="color: var(--primary-color);">Orders</h1>
+            <div>
+                <span style="font-size: 14px; color: var(--text-muted);">Welcome, Admin</span>
+            </div>
+        </div>
+
+        <div class="stats-grid animate-fade">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value" id="statRev">₹0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value" id="statOrd">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending Requests</div>
+                <div class="stat-value" id="statReq">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Feedback</div>
+                <div class="stat-value" id="statFeed">0</div>
+            </div>
+        </div>
+
+        <div id="ordersView" class="view-section active">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="requestsView" class="view-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Req ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Description</th>
+                        <th>Budget</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="requestsTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="feedbackView" class="view-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Feedback Message</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="feedbackTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

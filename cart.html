@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - StylePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 800px) {
+            .cart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .cart-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .item-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+        .item-details { flex: 1; }
+        .remove-btn {
+            color: var(--accent-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .total-row {
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--primary-color);
+            border-top: 2px solid var(--glass-border);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .custom-preview-img {
+            max-width: 60px;
+            max-height: 60px;
+            border-radius: 4px;
+            margin-top: 5px;
+            border: 1px solid var(--glass-border);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html">The Collection</a>
+                    <a href="custom-request.html">Design Your Own</a>
+                    <a href="cart.html" style="color: var(--accent-color);">Bag (<span id="cart-count">0</span>)</a>
+                    <a href="auth.html" id="auth-link">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 40px 20px;">
+        <h1 style="margin-bottom: 30px; color: var(--primary-color);">Your Shopping Cart</h1>
+        
+        <div class="cart-grid animate-fade">
+            <div class="glass-panel" style="padding: 20px;" id="cartItemsContainer">
+                <!-- Cart Items Rendered Here -->
+            </div>
+            
+            <div class="glass-panel" style="padding: 30px; height: fit-content;">
+                <h3 style="margin-bottom: 25px;">Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotalAmount">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total</span>
+                    <span id="totalAmount">₹0.00</span>
+                </div>
+                
+                <button class="btn btn-primary" onclick="proceedToCheckout()" style="width: 100%; margin-top: 30px; padding: 15px;">Proceed to Checkout</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help finding the perfect fit?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    renderCart(user.uid);
+                } else {
+                    const container = document.getElementById('cartItemsContainer');
+                    container.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                        <h3>Please login to view your cart</h3>
+                        <a href="auth.html" class="btn btn-primary" style="margin-top:20px;">Login</a>
+                    </div>`;
+                    document.getElementById('subtotalAmount').textContent = formatINR(0);
+                    document.getElementById('totalAmount').textContent = formatINR(0);
+                }
+            });
+        });
+
+        async function renderCart(uid) {
+            const doc = await db.collection('carts').doc(uid).get();
+            const cart = doc.exists ? (doc.data().items || []) : [];
+            const container = document.getElementById('cartItemsContainer');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                    <h3>Your cart is empty</h3>
+                    <a href="shop.html" class="btn btn-primary" style="margin-top:20px;">Start Shopping</a>
+                </div>`;
+                document.getElementById('subtotalAmount').textContent = formatINR(0);
+                document.getElementById('totalAmount').textContent = formatINR(0);
+                return;
+            }
+
+            container.innerHTML = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                total += item.price;
+                const sizeDisplay = item.size === 'Custom' 
+                    ? `Custom (${item.sizeDetails})` 
+                    : item.size;
+
+                let extrasHTML = '';
+                if(item.customText) {
+                    extrasHTML += `<div style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">Text: "${item.customText}"</div>`;
+                }
+                if(item.customImage) {
+                    extrasHTML += `
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">
+                            Uploaded Design:<br>
+                            <img src="${item.customImage}" class="custom-preview-img" alt="Custom Drawing">
+                        </div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}" class="item-img">
+                        <div class="item-details">
+                            <h4 style="margin-bottom: 5px;">${item.name}</h4>
+                            <div style="font-size: 14px; color: var(--text-main); margin-bottom: 5px;">Size: <strong>${sizeDisplay}</strong></div>
+                            ${extrasHTML}
+                            <div style="font-weight: 800; color: var(--primary-color); margin-top: 10px;">${formatINR(item.price)}</div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('subtotalAmount').textContent = formatINR(total);
+            document.getElementById('totalAmount').textContent = formatINR(total);
+        }
+
+        async function removeFromCart(index) {
+            if (!auth.currentUser) return;
+            const ref = db.collection('carts').doc(auth.currentUser.uid);
+            const doc = await ref.get();
+            if(doc.exists) {
+                let cart = doc.data().items || [];
+                cart.splice(index, 1);
+                await ref.set({ items: cart });
+                renderCart(auth.currentUser.uid);
+                updateCartCount();
+            }
+        }
+
+        async function proceedToCheckout() {
+            if(!auth.currentUser) {
+                alert('Please login or register to checkout.');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            const doc = await db.collection('carts').doc(auth.currentUser.uid).get();
+            const cart = doc.exists ? (doc.data().items || []) : [];
+            
+            if(cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            window.location.href = 'checkout.html';
+        }
+    </script>
+</body>
+</html>

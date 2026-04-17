@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - StylePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+        @media (max-width: 800px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .checkout-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+        .checkout-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+        #checkoutBtn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            border: 1px solid var(--glass-border);
+            background: #fff;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .payment-option:hover {
+            border-color: var(--accent-color);
+        }
+        .payment-details {
+            display: none;
+            background: rgba(255,255,255,0.5);
+            padding: 20px;
+            border: 1px solid #ebebeb;
+            margin-bottom: 20px;
+        }
+        .payment-details.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+    </style>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init({
+              publicKey: "HqQgWvDeF2E6UOZtr",
+            });
+        })();
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html">The Collection</a>
+                    <a href="custom-request.html">Design Your Own</a>
+                    <a href="cart.html" style="color: var(--accent-color);">Back to Bag</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 40px 20px;">
+        <h1 style="margin-bottom: 30px; color: var(--primary-color);">Secure Checkout</h1>
+        
+        <div class="checkout-grid animate-fade">
+            <div class="glass-panel" style="padding: 40px;">
+                <form id="checkoutForm">
+                    <h3 style="margin-bottom: 20px;">Shipping Information</h3>
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="shName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="shAddr" class="form-control" placeholder="123 Tailor St" required>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="shCity" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ZIP/Postal Code</label>
+                            <input type="text" id="shZip" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 30px 0 20px;">Payment Information</h3>
+                    
+                    <div class="payment-methods">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentType" value="UPI" checked onclick="togglePaymentDetails('upi')">
+                            <span style="font-weight: 500;">UPI (Google Pay, PhonePe, Paytm)</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentType" value="Card" onclick="togglePaymentDetails('card')">
+                            <span style="font-weight: 500;">Credit / Debit Card</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="paymentType" value="COD" onclick="togglePaymentDetails('cod')">
+                            <span style="font-weight: 500;">Cash on Delivery (COD)</span>
+                        </label>
+                    </div>
+
+                    <!-- UPI Details -->
+                    <div id="upiDetails" class="payment-details active">
+                        <p style="margin-bottom: 15px; font-size: 14px; color: var(--text-muted); text-align: center;">Scan this QR to pay, or enter your UPI ID below.</p>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="Mock QR Code" style="display: block; margin: 0 auto 15px; width: 120px; height: 120px;">
+                        <input type="text" id="upiId" class="form-control" placeholder="yourname@upi" required>
+                    </div>
+
+                    <!-- Card Details -->
+                    <div id="cardDetails" class="payment-details">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" id="cardNumber" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" id="cardExp" class="form-control" placeholder="MM/YY">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="password" id="cardCvv" class="form-control" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COD Details -->
+                    <div id="codDetails" class="payment-details">
+                        <p style="font-size: 14px; color: var(--text-muted); text-align: center; font-weight: 500;">You will pay cash upon delivery.<br>Please keep exact change ready.</p>
+                    </div>
+
+                    <button type="submit" id="checkoutBtn" class="btn btn-accent" style="width: 100%; padding: 15px; font-size: 18px; margin-top: 20px;">Confirm & Pay</button>
+                    <div id="emailStatus" style="text-align: center; margin-top: 15px; font-weight: 600; color: var(--primary-color);"></div>
+                </form>
+            </div>
+            
+            <div class="glass-panel" style="padding: 30px; height: fit-content; background: rgba(255,255,255,0.8);">
+                <h3 style="margin-bottom: 20px;">Order Reference</h3>
+                <div id="checkoutItems" style="margin-bottom: 20px;">
+                    <!-- Items -->
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 20px; color: var(--primary-color);">
+                    <span>Total to Pay</span>
+                    <span id="checkoutTotal">₹0.00</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help finding the perfect fit?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            auth.onAuthStateChanged(async (user) => {
+                if(!user) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if(userDoc.exists) document.getElementById('shName').value = userDoc.data().name;
+
+                const cartDoc = await db.collection('carts').doc(user.uid).get();
+                const cart = cartDoc.exists ? (cartDoc.data().items || []) : [];
+                
+                if(cart.length === 0) {
+                    window.location.href = 'cart.html';
+                    return;
+                }
+
+                let total = 0;
+                const itemsContainer = document.getElementById('checkoutItems');
+                itemsContainer.innerHTML = '';
+                cart.forEach(item => {
+                    total += item.price;
+                    itemsContainer.innerHTML += `
+                        <div class="checkout-item">
+                            <img src="${item.image}" alt="">
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; font-weight: 500;">${item.name} (${item.size === 'Custom' ? 'Custom' : item.size})</div>
+                            </div>
+                            <span style="font-weight: 600;">${formatINR(item.price)}</span>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('checkoutTotal').textContent = formatINR(total);
+
+            // Export to Global namespace since onclick needs it
+            window.togglePaymentDetails = function(type) {
+                document.querySelectorAll('.payment-details').forEach(d => d.classList.remove('active'));
+                
+                // Remove required from all conditional inputs
+                document.getElementById('upiId').removeAttribute('required');
+                document.getElementById('cardNumber').removeAttribute('required');
+                document.getElementById('cardExp').removeAttribute('required');
+                document.getElementById('cardCvv').removeAttribute('required');
+
+                if (type === 'upi') {
+                    document.getElementById('upiDetails').classList.add('active');
+                    document.getElementById('upiId').setAttribute('required', 'true');
+                } else if (type === 'card') {
+                    document.getElementById('cardDetails').classList.add('active');
+                    document.getElementById('cardNumber').setAttribute('required', 'true');
+                    document.getElementById('cardExp').setAttribute('required', 'true');
+                    document.getElementById('cardCvv').setAttribute('required', 'true');
+                } else if (type === 'cod') {
+                    document.getElementById('codDetails').classList.add('active');
+                }
+            };
+
+            document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const btn = document.getElementById('checkoutBtn');
+                const status = document.getElementById('emailStatus');
+                
+                btn.disabled = true;
+                btn.textContent = "Processing Order & Sending Email...";
+                status.textContent = "Connecting to mail server...";
+
+                const generatedOrderId = '#' + Math.floor(100000 + Math.random() * 900000);
+
+                // Prepare parameters based on the checkout data
+                const templateParams = {
+                    to_name: document.getElementById('shName').value,
+                    to_email: user.email,
+                    order_id: generatedOrderId,
+                    total_amount: formatINR(total),
+                    message: "Thank you for shopping with StylePro! Your custom order has been received and will be shipped to " + document.getElementById('shAddr').value + ", " + document.getElementById('shCity').value + "."
+                };
+
+                // Trigger EmailJS
+                emailjs.send('service_uwemuvf', 'template_i9c6o6o', templateParams).then(
+                    (response) => {
+                        console.log('SUCCESS!', response.status, response.text);
+                        finalizeOrder(user, cart, total, generatedOrderId);
+                    },
+                    (error) => {
+                        console.log('FAILED...', error);
+                        alert("Email could not be sent (check console for error), but we will still process your order!");
+                        finalizeOrder(user, cart, total, generatedOrderId);
+                    }
+                );
+            });
+            
+            async function finalizeOrder(user, cart, total, orderId) {
+                const selectedPayment = document.querySelector('input[name="paymentType"]:checked').value;
+                
+                const newOrder = {
+                    id: orderId,
+                    userId: user.uid,
+                    customerEmail: user.email,
+                    customerName: document.getElementById('shName').value,
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    items: cart,
+                    total: total,
+                    shippingAddress: document.getElementById('shAddr').value + ', ' + document.getElementById('shCity').value + ' - ' + document.getElementById('shZip').value,
+                    paymentMethod: selectedPayment,
+                    status: 'Processing'
+                };
+
+                try {
+                    // Add to Global Orders collection
+                    await db.collection('orders').add(newOrder);
+
+                    // Clear Cart in Firestore
+                    await db.collection('carts').doc(user.uid).set({ items: [] });
+
+                    window.location.href = 'order-confirmation.html';
+                } catch(error) {
+                    console.error("Error finalizing order:", error);
+                    alert("There was an error processing your order. Please try again.");
+                    document.getElementById('checkoutBtn').disabled = false;
+                    document.getElementById('checkoutBtn').textContent = "Confirm & Pay";
+                }
+            }
+            });
+        });
+    </script>
+</body>
+</html>

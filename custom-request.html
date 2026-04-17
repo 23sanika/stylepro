@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Request - StylePro</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .request-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            padding: 40px 0 80px 0;
+        }
+        @media (max-width: 900px) {
+            .request-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 150px;
+            font-family: inherit;
+        }
+        .chat-container {
+            background: #fff;
+            border: 1px solid #ebebeb;
+            padding: 40px;
+        }
+        .preview-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .preview-box img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+        }
+    </style>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init({
+              publicKey: "HqQgWvDeF2E6UOZtr",
+            });
+        })();
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html">The Collection</a>
+                    <a href="custom-request.html" style="color: var(--accent-color);">Design Your Own</a>
+                    <a href="cart.html">Bag (<span id="cart-count">0</span>)</a>
+                    <a href="auth.html" id="auth-link">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1 style="margin-top: 60px; font-size: 3rem;">Atelier Request</h1>
+        <p style="color: var(--text-muted); font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; margin-bottom: 40px;">
+            Have a specific Kurti, Dress, or Top in mind? Chat with our master tailors. Share your thoughts, describe the outfit, and upload reference images below.
+        </p>
+
+        <div class="request-layout animate-fade">
+            <div class="chat-container">
+                <form id="requestForm">
+                    <div class="form-group">
+                        <label>Describe Your Dream Outfit</label>
+                        <textarea class="form-control" id="reqDescription" placeholder="e.g. I want an Anarkali Kurti with heavy zardosi work on the neckline, long sheer sleeves, and a deep back. The fabric should be silk..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Expected Budget (INR)</label>
+                        <input type="number" class="form-control" id="reqBudget" placeholder="e.g. 5000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Reference Images or Sketches</label>
+                        <input type="file" id="reqImages" class="form-control" accept="image/*" multiple>
+                        <div class="preview-box" id="imagePreviews"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 16px; margin-top: 20px;">Submit Design Request to Tailors</button>
+                    <div id="statusMsg" style="margin-top: 20px; font-weight: 500; color: #27ae60; text-align: center; display: none;">
+                        Your request has been sent! Our styling team will contact your email shortly.
+                    </div>
+                </form>
+            </div>
+
+            <div>
+                <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&auto=format&fit=crop" style="width: 100%; height: 600px; object-fit: cover;" alt="Master Tailor Desk">
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help finding the perfect fit?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const uploadInput = document.getElementById('reqImages');
+            const previewBox = document.getElementById('imagePreviews');
+            
+            uploadInput.addEventListener('change', function() {
+                previewBox.innerHTML = '';
+                Array.from(this.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        previewBox.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            document.getElementById('requestForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const user = auth.currentUser;
+                if(!user) {
+                    alert('Please log in to submit a custom design request.');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+                
+                const btn = e.target.querySelector('button');
+                btn.textContent = "Sending...";
+                btn.disabled = true;
+
+                const desc = document.getElementById('reqDescription').value;
+                const budget = document.getElementById('reqBudget').value;
+
+                let userName = "User";
+                try {
+                    const udoc = await db.collection('users').doc(user.uid).get();
+                    if(udoc.exists) userName = udoc.data().name || "User";
+                } catch(e) {}
+
+                const reqId = 'REQ-' + Math.floor(10000 + Math.random() * 90000);
+
+                // Create global request for Admin DB
+                const newReq = {
+                    id: reqId,
+                    userId: user.uid,
+                    date: firebase.firestore.FieldValue.serverTimestamp(),
+                    user: userName,
+                    email: user.email,
+                    description: desc,
+                    budget: budget,
+                    status: 'Pending Review'
+                };
+
+                try {
+                    await db.collection('requests').add(newReq);
+
+                    // Send email
+                    const templateParams = {
+                        to_name: userName,
+                        to_email: user.email,
+                        order_id: reqId,
+                        total_amount: budget ? 'Budget: ₹' + budget : 'TBD',
+                        message: `Your custom design request has been received by our Atelier team! Request details: ${desc}`
+                    };
+
+                    emailjs.send('service_uwemuvf', 'template_i9c6o6o', templateParams).then(
+                        (response) => {
+                            console.log('SUCCESS!', response.status, response.text);
+                            btn.style.display = 'none';
+                            document.getElementById('statusMsg').style.display = 'block';
+                        },
+                        (error) => {
+                            console.log('FAILED...', error);
+                            alert("Email could not be sent, but your request was successfully saved!");
+                            btn.style.display = 'none';
+                            document.getElementById('statusMsg').style.display = 'block';
+                        }
+                    );
+                } catch (error) {
+                    console.error("Error submitting request:", error);
+                    alert("There was an error saving your request. Please try again.");
+                    btn.textContent = "Submit Design Request to Tailors";
+                    btn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

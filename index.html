@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StylePro - Haute Couture & Custom Fit</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 85vh;
+            padding: 40px 0;
+            gap: 60px;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 5rem;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            color: var(--primary-color);
+            letter-spacing: -1px;
+        }
+
+        .hero-text p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 480px;
+            line-height: 1.8;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+
+        .hero-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 0;
+            box-shadow: 20px 20px 0px var(--accent-color);
+            object-fit: cover;
+            height: 650px;
+        }
+
+        @media (max-width: 900px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-text p {
+                margin: 0 auto 40px;
+            }
+            .hero-image img {
+                box-shadow: 10px 10px 0px var(--accent-color);
+            }
+        }
+    </style>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="images/logo.png" class="splash-logo" alt="StylePro Logo">
+    </div>
+    
+    <script>
+        // Removes the splash screen after 3 seconds
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if (splash) {
+                    splash.classList.add('fade-out');
+                    setTimeout(() => splash.remove(), 800); // Remove from DOM after fade transition
+                }
+            }, 3000);
+        });
+    </script>
+    
+    <style>
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffffff; /* Typically white or light background works best for logos */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+        #splash-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .splash-logo {
+            max-width: 400px;
+            width: 80%;
+            animation: pulseFade 1.5s infinite alternate;
+        }
+        @keyframes pulseFade {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+    </style>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html">The Collection</a>
+                    <a href="custom-request.html" style="color: var(--accent-color);">Design Your Own</a>
+                    <a href="cart.html">Bag (<span id="cart-count">0</span>)</a>
+                    <a href="auth.html" id="auth-link">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero animate-fade">
+            <div class="hero-text">
+                <h1>Redefining<br>Elegance.</h1>
+                <p>Discover our exclusive women's collection featuring Kurtis, Dresses, Tops, and Jeans. Or, let your imagination run wild and design an outfit entirely from scratch.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <a href="shop.html" class="btn btn-primary">Shop Collection</a>
+                    <a href="custom-request.html" class="btn btn-outline">Submit a Design Request</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1000&auto=format&fit=crop" alt="High Fashion Model">
+            </div>
+        </section>
+
+        <!-- Trending Drops Section -->
+        <section class="trending-drops section-padding">
+            <div class="section-header">
+                <h2>Trending Drops</h2>
+                <a href="shop.html" class="view-all">View All</a>
+            </div>
+            <div class="products-grid">
+                <!-- Product 1 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/gown.png" alt="Elegant Evening Dress">
+                        <div class="product-badges">
+                            <span class="badge new">New</span>
+                        </div>
+                        <button class="wishlist-btn" title="Add to Wishlist">♥</button>
+                    </div>
+                    <div class="product-info">
+                        <h3>Midnight Elegance Dress</h3>
+                        <p class="price">₹4,599</p>
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/kurti.png" alt="Silk Blend Kurti">
+                        <div class="product-badges">
+                            <span class="badge trending">Trending</span>
+                        </div>
+                        <button class="wishlist-btn" title="Add to Wishlist">♥</button>
+                    </div>
+                    <div class="product-info">
+                        <h3>Emerald Silk Kurti</h3>
+                        <p class="price">₹2,899</p>
+                    </div>
+                </div>
+                <!-- Product 3 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="images/top.png" alt="Classic White Top">
+                        <button class="wishlist-btn" title="Add to Wishlist">♥</button>
+                    </div>
+                    <div class="product-info">
+                        <h3>Pearl Chiffon Top</h3>
+                        <p class="price">₹1,499</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help with sizing or custom designs?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

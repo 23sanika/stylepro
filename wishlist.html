@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist - StylePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            padding: 40px 0;
+        }
+        .empty-wishlist {
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html">The Collection</a>
+                    <a href="custom-request.html">Design Your Own</a>
+                    <a href="cart.html">Bag (<span id="cart-count">0</span>)</a>
+                    <a href="auth.html" id="auth-link">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="min-height: 60vh;">
+        <h1 style="margin-top: 60px; text-align: center; color: var(--primary-color); font-size: 3rem;">My Wishlist</h1>
+        
+        <div id="wishlistContainer" class="wishlist-grid animate-fade">
+            <!-- Rendered by JS -->
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWishlist();
+        });
+
+        function renderWishlist() {
+            const wl = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            const container = document.getElementById('wishlistContainer');
+            
+            if (wl.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1;" class="empty-wishlist">
+                        Your wishlist is empty.<br><br>
+                        <a href="shop.html" class="btn btn-primary" style="display: inline-block; padding: 10px 20px;">Explore Collection</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            wl.forEach(id => {
+                const item = CATALOG.find(p => p.id === id);
+                if (item) {
+                    container.innerHTML += `
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="${item.image}" alt="${item.name}">
+                                <button class="wishlist-btn active" style="color: var(--primary-color);" title="Remove from Wishlist" onclick="toggleWishlist('${item.id}', this); setTimeout(renderWishlist, 100);">♥</button>
+                            </div>
+                            <div class="product-info">
+                                <h3>${item.name}</h3>
+                                <div class="price">${formatINR(item.price)}</div>
+                                <a href="product.html?id=${item.id}" class="btn btn-primary" style="width: 100%; margin-top: 15px;">View Details</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

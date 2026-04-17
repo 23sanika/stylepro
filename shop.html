@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Collection - StylePro</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            padding: 40px 0;
+        }
+        .shop-controls { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 40px; }
+        .search-bar { width: 100%; max-width: 500px; }
+        .search-bar input { width: 100%; padding: 14px 25px; border-radius: 30px; border: 1px solid #ebebeb; font-family: 'Montserrat', sans-serif; font-size: 14px; transition: var(--transition); box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .search-bar input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 5px 15px rgba(183,138,99,0.1); }
+        .category-filters { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .filter-btn { background: #fff; border: 1px solid #ebebeb; padding: 10px 24px; border-radius: 30px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 500; transition: var(--transition); text-transform: uppercase; letter-spacing: 1px; }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">StylePro</a>
+                <div class="nav-links">
+                    <a href="shop.html" style="color: var(--accent-color);">The Collection</a>
+                    <a href="custom-request.html">Design Your Own</a>
+                    <a href="cart.html">Bag (<span id="cart-count">0</span>)</a>
+                    <a href="auth.html" id="auth-link">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1 style="margin-top: 60px; text-align: center; color: var(--primary-color); font-size: 3.5rem;">The Curated Collection</h1>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 40px; font-family: 'Playfair Display', serif; font-style: italic;">Where perfect tailoring meets modern women's fashion.</p>
+        <div class="shop-controls animate-fade">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for dresses, kurtis, tops...">
+            </div>
+            <div class="category-filters" id="categoryFilters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="dress">Dresses</button>
+                <button class="filter-btn" data-filter="kurti">Kurtis</button>
+                <button class="filter-btn" data-filter="top">Tops</button>
+                <button class="filter-btn" data-filter="bottom">Bottoms</button>
+                <button class="filter-btn" data-filter="mens">Men's Wear</button>
+            </div>
+        </div>
+
+        <div class="products-grid animate-fade" id="shopGrid">
+            <!-- Rendered by JS -->
+        </div>
+    </main>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h2>StylePro</h2>
+                    <p>Redefining elegance with custom-fit fashion tailored just for you.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="shop.html">The Collection</a></li>
+                        <li><a href="custom-request.html">Design Your Own</a></li>
+                        <li><a href="cart.html">Bag</a></li>
+                        <li><a href="profile.html">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Join the Club</h3>
+                    <p>Subscribe for exclusive drops and styling tips.</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <input type="email" placeholder="Email Address" required>
+                        <button type="submit" class="btn btn-primary">→</button>
+                    </form>
+                    <p id="newsletter-message" class="newsletter-message" style="display:none;">Thanks for subscribing!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 StylePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle" class="chat-toggle" title="Chat with support">
+            <span class="chat-icon">💬</span>
+        </button>
+        <div id="chat-window" class="chat-window">
+            <div class="chat-header">
+                <h3>StylePro Support</h3>
+                <button id="chat-close" class="chat-close">&times;</button>
+            </div>
+            <div class="chat-body" id="chat-body">
+                <div class="chat-message bot">
+                    <p>Hi there! 👋 Need help finding the perfect fit?</p>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" placeholder="Type your message..." id="chat-input" autocomplete="off">
+                <button class="send-btn" id="chat-send">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('shopGrid');
+            const searchInput = document.getElementById('searchInput');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            let currentFilter = 'all';
+            let searchQuery = '';
+            let currentWishlist = [];
+
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const wlDoc = await db.collection('wishlists').doc(user.uid).get();
+                    if(wlDoc.exists) currentWishlist = wlDoc.data().items || [];
+                } else {
+                    currentWishlist = [];
+                }
+                renderShop();
+            });
+
+            function renderShop() {
+                grid.innerHTML = '';
+                
+                const filtered = CATALOG.filter(item => {
+                    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                          item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+                    const matchesCategory = currentFilter === 'all' || item.category === currentFilter;
+                    return matchesSearch && matchesCategory;
+                });
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No products found matching your criteria.</p>';
+                    return;
+                }
+
+                filtered.forEach(item => {
+                    const isWished = currentWishlist.includes(item.id);
+                    const wishStyle = isWished ? 'color: var(--primary-color);' : '';
+                    grid.innerHTML += `
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="${item.image}" alt="${item.name}">
+                                <button class="wishlist-btn ${isWished ? 'active' : ''}" style="${wishStyle}" title="Add to Wishlist" onclick="toggleWishlist('${item.id}', this)">♥</button>
+                            </div>
+                            <div class="product-info">
+                                <h3>${item.name}</h3>
+                                <div class="price">${formatINR(item.price)}</div>
+                                <a href="product.html?id=${item.id}" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Customize & Buy</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Event Listeners
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value;
+                    renderShop();
+                });
+            }
+
+            if (filterBtns) {
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentFilter = btn.dataset.filter;
+                        renderShop();
+                    });
+                });
+            }
+
+            // Initial render handled by onAuthStateChanged
+        });
+    </script>
+</body>
+</html>
