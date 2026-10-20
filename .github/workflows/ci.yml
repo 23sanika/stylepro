@@ -1,0 +1,24 @@
+   name: CI Pipeline
+   on:
+     push:
+       branches: [ main ]
+     pull_request:
+       branches: [ main ]
+   jobs:
+     build-and-test:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+         - name: Verify required files
+           run: |
+             for f in index.html shop.html cart.html custom-request.html style.css main.js; do
+               test -f "$f" || { echo "Missing $f"; exit 1; }
+             done
+         - name: Build Docker image
+           run: docker build -t stylepro .
+         - name: Run container and smoke test
+           run: |
+             docker run -d -p 8080:80 --name stylepro stylepro
+             sleep 3
+             curl -f http://localhost:8080/index.html
